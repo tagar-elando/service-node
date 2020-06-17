@@ -1,0 +1,22 @@
+{
+  "name": "tagar-node",
+  "version": "1.0.0-SNAPSHOOT",
+  "main": "src/server.ts",
+  "license": "MIT",
+  "scripts": {
+    "serve": "nodemon --watch \"src\" --exec \"ts-node src/server.ts\" -e ts"
+  },
+  "dependencies": {
+    "@types/uuid": "^8.0.0",
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0",
+    "typescript": "^3.9.5",
+    "uuid": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "@types/socket.io": "^2.1.8",
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2"
+  }
+}
