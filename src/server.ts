@@ -8,6 +8,10 @@ const corsOptions = {
 
 app.app.use(cors(corsOptions));
 
+app.app.get("/", function (req, res) {
+  res.send("Hello World!");
+});
+
 app.server.listen(8080, function () {
   console.log(`App is running on port 8080!`);
 });
