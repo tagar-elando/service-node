@@ -10,8 +10,15 @@ interface IIncomingMessage {
 
 interface IOutcomeMessage {
   chatId: string;
+  user: string;
   timestamp: Date;
   message: string;
+}
+
+interface IUserDisconnected {
+  chatId: string;
+  user: string;
+  timestamp: Date;
 }
 
 class App {
@@ -31,6 +38,7 @@ class App {
   private listen() {
     this.socket.on("connection", (socket) => {
       console.log(`[${socket.id}] Usuário conectado`);
+      socket.emit("user-info", socket.id);
 
       socket.on("disconnect", () => {
         console.log(`[${socket.id}] Usuário desconectado`);
@@ -57,15 +65,31 @@ class App {
       socket.on("chat-message", ({ chatId, message }: IIncomingMessage) => {
         const outMessage: IOutcomeMessage = {
           timestamp: new Date(),
+          user: socket.id,
           message,
           chatId,
         };
-        socket.to(chatId).emit("chat-message", JSON.stringify(outMessage));
+        socket.to(chatId).emit("chat-message", outMessage);
       });
 
       socket.on("chat-exit", (chatId: string) => {
+        const userDisconnected: IUserDisconnected = {
+          user: socket.id,
+          timestamp: new Date(),
+          chatId,
+        };
+        const messageToOtherUsers: IOutcomeMessage = {
+          ...userDisconnected,
+          user: "system",
+          message: `Stranger have disconnected.`,
+        };
+        this.socket.in(chatId).emit("user-disconnected", userDisconnected);
+        socket.to(chatId).emit("chat-message", messageToOtherUsers);
         socket.leave(chatId);
-        socket.to(chatId).emit("chat-exit", chatId);
+        socket.emit("chat-message", {
+          ...messageToOtherUsers,
+          message: "You have disconnected.",
+        });
       });
     });
   }
