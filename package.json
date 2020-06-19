@@ -4,7 +4,9 @@
   "main": "src/server.ts",
   "license": "MIT",
   "scripts": {
-    "serve": "nodemon --watch \"src\" --exec \"ts-node src/server.ts\" -e ts"
+    "serve": "nodemon --watch \"src\" --exec \"ts-node src/server.ts\" -e ts",
+    "build": "tsc",
+    "start": "node ./dist/server.js"
   },
   "dependencies": {
     "@types/cors": "^2.8.6",
