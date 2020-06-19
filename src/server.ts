@@ -12,6 +12,8 @@ app.app.get("/", function (req, res) {
   res.send("Hello World!");
 });
 
-app.server.listen(8080, function () {
-  console.log(`App is running on port 8080!`);
+const port = process.env.PORT || 8080;
+
+app.server.listen(port, function () {
+  console.log(`App is running on port ${port}!`);
 });
