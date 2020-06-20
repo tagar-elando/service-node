@@ -21,6 +21,11 @@ interface IUserDisconnected {
   timestamp: Date;
 }
 
+interface IUserTyping {
+  chatId: string;
+  user: string;
+}
+
 class App {
   public app: Application;
   public server: Server;
@@ -90,6 +95,15 @@ class App {
           ...messageToOtherUsers,
           message: "You have disconnected.",
         });
+      });
+
+      socket.on("chat-typing", (chatId: string)=> {
+        console.log(`[${socket.id}] Usuário digitando`);
+        const userTyping:IUserTyping = {
+            chatId: chatId,
+            user:socket.id
+        }
+        socket.to(chatId).emit("chat-typing", userTyping);
       });
     });
   }
