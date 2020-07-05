@@ -33,9 +33,12 @@ export default class ChatSocketServer {
         }
       });
 
-      socket.on("disconnect", () =>
-        console.log(`[${socket.id}] User disconnected from server`)
-      );
+      socket.on("disconnecting", () => {
+        Object.keys(socket.rooms).forEach((roomId) =>
+          this.exitRoom(socket, roomId)
+        );
+        console.log(`[${socket.id}] User disconnected from server`);
+      });
 
       socket.on("chat-message", ({ chatId, message }: IIncomingMessage) =>
         this.sendMessage(socket, message, chatId)
