@@ -19,40 +19,38 @@ export default class ChatSocketServer {
 
   private listen() {
     this.socket.on("connection", (socket) => {
-      console.log(`[${socket.id}] Usuário conectado`);
+      console.log(`[${socket.id}] User connected on server`);
       socket.emit("user-info", socket.id);
 
-      socket.on("disconnect", () => {
-        console.log(`[${socket.id}] Usuário desconectado`);
-      });
-
       socket.on("new", () => {
-        console.log(`[${socket.id}] Solicitou nova sala`);
         const stranger = this.poolPerson.find((e) => e.id !== socket.id);
         if (stranger) {
-          this.newRoom(stranger, socket);
+          console.log(`[${socket.id}] [${stranger.id}] Now are connected`);
+          this.newRoom([stranger, socket]);
         } else {
+          console.log(`[${socket.id}] Waiting for another person...`);
           this.poolPerson.push(socket);
         }
       });
 
-      socket.on("chat-message", ({ chatId, message }: IIncomingMessage) => {
-        this.sendMessage(socket, message, chatId);
-      });
+      socket.on("disconnect", () =>
+        console.log(`[${socket.id}] User disconnected from server`)
+      );
 
-      socket.on("chat-exit", (chatId: string) => {
-        this.exitRoom(socket, chatId);
-      });
+      socket.on("chat-message", ({ chatId, message }: IIncomingMessage) =>
+        this.sendMessage(socket, message, chatId)
+      );
 
-      socket.on("chat-typing", (chatId: string) => {
-        this.sendTyping(socket, chatId);
-      });
+      socket.on("chat-typing", (chatId: string) =>
+        this.sendTyping(socket, chatId)
+      );
+
+      socket.on("chat-exit", (chatId: string) => this.exitRoom(socket, chatId));
     });
   }
 
-  private newRoom(stranger: Socket, socket: Socket) {
+  private newRoom(users: Array<Socket>) {
     const chatId = uuid();
-    const users = [stranger, socket];
     users.forEach((user) => {
       user.join(chatId);
       this.socket.to(user.id).emit("room-subscribed", chatId);
